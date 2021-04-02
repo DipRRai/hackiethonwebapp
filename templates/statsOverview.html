@@ -1,6 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+
     <head>
+        <title>stats</title>
+        <script>
+            setInterval(function() {
+    fetch('/test')
+      .then(function (response) {
+          return response.json();
+      }).then(function (text) {
+          if(text.changed === "yes"){console.log('query'); location.reload();}
+          else {console.log("nonquery");}
+      });
+}, 1000);
+
+        </script>
     </head>
     <body>
         <h1>Welcome to your stats page</h1>
