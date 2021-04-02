@@ -6,9 +6,13 @@ db = SQLAlchemy(app)
 
 
 
-@app.route("/")
+@app.route("/", methods=['POST'])
 def home():
     return render_template("home.html")
+
+@app.route('/stats/<hours>', methods=['POST','GET'])
+def stats(hours):
+    return render_template("statsOverview.html", hours = hours)
 
 
 if __name__ == "__main__":
