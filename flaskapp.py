@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///input.db'
@@ -12,13 +12,15 @@ def home():
 
 @app.route('/stats/', methods=["POST", "GET"])
 def display():
+    global g_hours
+    if request.method == "POST":
+        g_hours = request.form["hours"]
+        return redirect("/stats/")
     return render_template("statsOverview.html", hours=g_hours)
 
 @app.route('/stats/<hours>', methods=['POST','GET'])
 def stats(hours):
-    global g_hours
-    g_hours = hours
-    return render_template("statsOverview.html", hours = g_hours)
+    return render_template("statsOverview.html", hours = hours)
 
 
 if __name__ == "__main__":
