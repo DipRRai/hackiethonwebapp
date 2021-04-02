@@ -18,9 +18,3 @@ def stats(hours):
 if __name__ == "__main__":
     app.run(debug=True)
 
-
-
-#asd;lfkjasdl;kfjasd;lkfj
-
-#Test branching merge/pull rqeuest
-=======
