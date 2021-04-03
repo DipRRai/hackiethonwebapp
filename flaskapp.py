@@ -175,7 +175,25 @@ def display():
             color.append("rgba(255, 99, 132, 0.2)")
             sum += i
         average = round(sum / len(ylabl), 2)
-        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session)
+        #######################
+        #Examples of what data input could be like
+        #######################
+        donutXlabel = ["'youtube", 'twitch', 'microsoft word']
+        donutYlabel = [3,2,5]
+        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
  ######################################################################################################
