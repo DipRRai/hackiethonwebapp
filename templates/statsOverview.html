@@ -2,6 +2,16 @@
 <html lang="en">
     <head>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+
+        <script>setInterval(function() {
+    fetch('/test')
+      .then(function (response) {
+          return response.json();
+      }).then(function (text) {
+          if(text.changed === "yes"){console.log('query'); location.reload();}
+          else {console.log("nonquery");}
+      });
+}, 1000);</script>
     </head>
     <body>
         <h1>Welcome to your stats page</h1>
@@ -48,6 +58,5 @@
                 <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
             </form>
         </div>
-        
     </body>
 </html>
