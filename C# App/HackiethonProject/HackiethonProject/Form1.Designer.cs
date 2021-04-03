@@ -36,6 +36,7 @@
             this.btnLogin = new System.Windows.Forms.Button();
             this.lblLoginStatus = new System.Windows.Forms.Label();
             this.tmrCounter = new System.Windows.Forms.Timer(this.components);
+            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // label3
@@ -96,11 +97,20 @@
             this.tmrCounter.Interval = 1000;
             this.tmrCounter.Tick += new System.EventHandler(this.tmrCounter_Tick);
             // 
+            // richTextBox1
+            // 
+            this.richTextBox1.Location = new System.Drawing.Point(12, 218);
+            this.richTextBox1.Name = "richTextBox1";
+            this.richTextBox1.Size = new System.Drawing.Size(416, 161);
+            this.richTextBox1.TabIndex = 12;
+            this.richTextBox1.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(451, 314);
+            this.ClientSize = new System.Drawing.Size(440, 391);
+            this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.lblLoginStatus);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtPassword);
@@ -123,6 +133,7 @@
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label lblLoginStatus;
         private System.Windows.Forms.Timer tmrCounter;
+        private System.Windows.Forms.RichTextBox richTextBox1;
     }
 }
 

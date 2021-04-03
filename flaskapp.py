@@ -21,10 +21,11 @@ class Users(db.Model):
 def home():
     #db.create_all()
     #user_obj = Users.query.filter_by(username=session['user']).first()
-    #user_obj.screen_time += "3:5:2021~50|"
+    #user_obj.app_time = "Word.exe~0|"
     #db.session.commit()
     return render_template("home.html", session=session)
 
+#Get current user's screen time statistics
 @app.route("/get_timestats", methods=['POST', 'GET'])
 def get_timestats():
     if request.method == "POST":
@@ -36,6 +37,17 @@ def get_timestats():
     else:
         return "You are not meant to be here"
 
+@app.route("/get_appstats", methods=["POST","GET"])
+def get_appstats():
+    if request.method == "POST":
+        if "user" not in session:
+            return "notLoggedIn"
+        else:
+            user_obj = Users.query.filter_by(username=session['user']).first()
+            return user_obj.app_time
+    else:
+        return "You are not meant to be here"
+
 #Config page for apps that needs to be monitored
 @app.route("/config", methods=["POST", "GET"])
 def config():
@@ -44,11 +56,11 @@ def config():
     else:
         user_obj = Users.query.filter_by(username=session['user']).first()
         key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
-        apps = [name.split(":")[0] for name in key_val_pair]
+        apps = [name.split("~")[0] for name in key_val_pair]
         app_dict = {}
         for entry in key_val_pair:
-            key = entry.split(":")[0]
-            val = entry.split(":")[1]
+            key = entry.split("~")[0]
+            val = entry.split("~")[1]
             app_dict[key] = val
         if request.method == "POST":
             if "submit" in request.form and request.form["submit"] == "addapp":
@@ -58,7 +70,7 @@ def config():
                     app_dict[app_name] = "0"
                     db_str = ""
                     for app in apps:
-                        db_str += f"{app}:{app_dict[app]}|"
+                        db_str += f"{app}~{app_dict[app]}|"
                     user_obj.app_time = db_str
                     db.session.commit()
                 return redirect("/config")
@@ -66,7 +78,7 @@ def config():
                 apps.remove(request.form["deleteapp"])
                 db_str = ""
                 for app in apps:
-                    db_str += f"{app}:{app_dict[app]}|"
+                    db_str += f"{app}~{app_dict[app]}|"
                 user_obj.app_time = db_str
                 db.session.commit()
                 return redirect("/config")
@@ -114,7 +126,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password, app_time = "example.exe:0|",screen_time="1:1:2000~1|"))
+            db.session.add(Users(username = username, password = password, app_time = "example.exe~0|",screen_time="1:1:2000~1|"))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -147,9 +159,17 @@ def display():
         if "user" not in session:
             return "Not Logged In"
         else:
+            #print(request.form)
             if "stats" in request.form:
                 user_obj = Users.query.filter_by(username=session['user']).first()
                 user_obj.screen_time = request.form["stats"]
+                db.session.commit()
+                isChanged = True
+                return "success"
+            elif "appstats" in request.form:
+                #print(request.form["appstats"])
+                user_obj = Users.query.filter_by(username=session['user']).first()
+                user_obj.app_time = request.form["appstats"]
                 db.session.commit()
                 isChanged = True
                 return "success"
@@ -159,7 +179,7 @@ def display():
         if "user" not in session:
             return redirect("/login")
         user_obj = Users.query.filter_by(username=session['user']).first()
-        print(user_obj.screen_time)
+        print(user_obj.app_time)
         key_val_pair = list(filter(lambda x: len(x) !=0, user_obj.screen_time.split("|")))
         xlabl = []
         ylabl = []

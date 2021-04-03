@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Web.Script.Serialization;
 using System.Windows.Forms;
@@ -109,8 +110,96 @@ namespace HackiethonProject
                 var content = new FormUrlEncodedContent(values);
                 var response = await client.PostAsync("http://127.0.0.1:5000/stats/", content);
                 var responseString = await response.Content.ReadAsStringAsync();
-                //MessageBox.Show(responseString);
-                
+
+                //App time collection
+
+                Dictionary<string, float> appDict = new Dictionary<string, float> { };
+
+                var content_app = new FormUrlEncodedContent(values);
+                var response_app = await client.PostAsync("http://127.0.0.1:5000/get_appstats", content_app);
+                var responseString_app = await response_app.Content.ReadAsStringAsync();
+                string[] entries = responseString_app.Split('|');
+                string[] firstEntry = entries[0].Split('~');
+
+                if (firstEntry[0] != "datetime")
+                {
+                    string appString = "datetime~" + dateString+ "|" + responseString_app;
+
+                    var values_app = new Dictionary<string, string>
+                    {
+                        {"appstats", appString}
+                    };
+
+                    content_app = new FormUrlEncodedContent(values_app);
+                    response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
+                    responseString_app = await response_app.Content.ReadAsStringAsync();
+                }
+                else
+                {
+                    int count = 0;
+                    bool isNewDay = false;
+                    richTextBox1.Text += string.Join(",", entries) + '\n';
+                    foreach (string entry in entries)
+                    {
+                        if (entry.Length == 0)
+                        {
+                            continue;
+                        }
+
+                        if (count == 0)
+                        {
+                            string serverDate = entry.Split('~')[1];
+                            //MessageBox.Show(serverDate + " " + dateString);
+                            if (serverDate != dateString)
+                            {
+                                isNewDay = true;
+                            }
+                        }
+                        else
+                        {
+                            if (isNewDay)
+                            {
+                                string[] pair = entry.Split('~');
+                                string appName = pair[0];
+                                float timeCount = 0;
+                                appDict[appName] = 0;
+                            }
+                            else
+                            {
+                                string[] pair = entry.Split('~');
+                                string appName = pair[0];
+                                float timeCount = float.Parse(pair[1]);
+                                appDict[appName] = timeCount;
+                                foreach (Process p in Process.GetProcesses())
+                                {
+                                    if (p.ProcessName.ToLower() == appName.ToLower())
+                                    {
+                                        appDict[appName] += 1;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        count++;
+                    }
+
+                    string userAppStat = "datetime~" + dateString + "|";
+                    foreach (KeyValuePair<string, float> kvp in appDict)
+                    {
+                        userAppStat = userAppStat + kvp.Key.ToString() + "~" + kvp.Value.ToString() + "|";
+                    }
+
+                    //MessageBox.Show(userAppStat);
+
+                    var values_app = new Dictionary<string, string>
+                    {
+                        {"appstats", userAppStat}
+                    };
+
+                    content_app = new FormUrlEncodedContent(values_app);
+                    response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
+                    responseString_app = await response_app.Content.ReadAsStringAsync();
+                }
             }
         }
     }
