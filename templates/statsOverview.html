@@ -5,10 +5,7 @@
     </head>
     <body>
         <h1>Welcome to your stats page</h1>
-        <form action="/" method="post">
-            <button name="returnHome" type="submit" style="width: 100px; height: 70px;">Go Home</button>
-        </form>
-        <canvas id="myChart" width="400" height="100">
+        <canvas id="myChart" width="600" height="100">
             <script>
             var ctx = document.getElementById('myChart').getContext('2d');
             var ylabel = {{ ylabl }};
@@ -38,6 +35,19 @@
             });
             </script>
         </canvas>
-        <h3>You have spent {{ hours }} hours on your computer</h3>
+        <div style="padding: 5px;">
+            <ul style="float: left">
+                <li>
+                    <h3>You have spent {{ sum }} hours on your computer</h3>
+                </li>
+                <li>
+                    <h3>That is an average of {{ average }} hours per day</h3>
+                </li>
+            </ul>
+            <form action="/" method="post">
+                <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
+            </form>
+        </div>
+        
     </body>
 </html>

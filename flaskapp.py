@@ -27,11 +27,12 @@ def display():
 #the graph scales with number of entries so as long as you can make a link it can generate a graph
 #the graph type can be customised by just changing one word (bar, line ...)
 #Example link
-#http://127.0.0.1:5000/stats/6.9~5.2~3.7~/3:04:2021~4:04:2021~5:04:2021~
+#http://127.0.0.1:5000/stats/6.9~5.2~3.7~5.8~8~/3:04:2021~4:04:2021~5:04:2021~6:04:2021~7:04:2021~~
 @app.route('/stats/<hours>/<days>', methods=['POST','GET'])
 def stats(hours, days):
 #Converts input link into sets of arrays that is fed into graph.js
     temp = ""
+    sum = 0
     ylabl = []
     for i in hours:
         if i != ('~'):
@@ -52,9 +53,11 @@ def stats(hours, days):
             xlabl.append(str(temp))
             temp = ""
     #small fix for bar graph that creates color values equal to the number of labels (since each label requires a reparate rgba value)
-    for i in xlabl:
+    for i in ylabl:
         color.append("rgba(255, 99, 132, 0.2)")
-    return render_template("statsOverview.html", xlabl = xlabl, ylabl = ylabl, color = color)
+        sum += i
+    average = round(sum / len(ylabl), 2)
+    return render_template("statsOverview.html", xlabl = xlabl, ylabl = ylabl, color = color, sum = sum, average = average)
 
 
 if __name__ == "__main__":
