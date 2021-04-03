@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
     <head>
-        <title>stats</title>
-        <script>
-            setInterval(function() {
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+        <script>setInterval(function() {
     fetch('/test')
       .then(function (response) {
           return response.json();
@@ -12,15 +10,53 @@
           if(text.changed === "yes"){console.log('query'); location.reload();}
           else {console.log("nonquery");}
       });
-}, 1000);
-
-        </script>
+}, 1000);</script>
     </head>
     <body>
         <h1>Welcome to your stats page</h1>
-        <form action="/" method="post">
-            <button name="returnHome" type="submit" style="width: 100px; height: 70px;">Go Home</button>
-        </form>
-        <h3>You have spent {{ hours }} hours on your computer</h3>
+        <canvas id="myChart" width="600" height="100">
+            <script>
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var ylabel = {{ ylabl }};
+            var xlabel = {{ xlabl | tojson }};
+            var color = {{ color | tojson }};
+            var myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: xlabel,
+                    datasets: [{
+                        label: 'Hours spent online',
+                        data: ylabel,
+                        backgroundColor: color,
+                        borderColor: color,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+            </script>
+        </canvas>
+        <div style="padding: 5px;">
+            <ul style="float: left">
+                <li>
+                    <h3>You have spent {{ sum }} hours on your computer</h3>
+                </li>
+                <li>
+                    <h3>That is an average of {{ average }} hours per day</h3>
+                </li>
+            </ul>
+            <form action="/" method="post">
+                <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
+            </form>
+        </div>
+
     </body>
 </html>

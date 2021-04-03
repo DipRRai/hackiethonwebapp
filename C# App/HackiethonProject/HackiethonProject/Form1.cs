@@ -29,11 +29,15 @@ namespace HackiethonProject
             
             var values = new Dictionary<string, string>
             {
-                {"hours",  txtData.Text}
+                {"hours",  txtHours.Text },
+                { "days", txtDays.Text}
             };
+
+
             var content = new FormUrlEncodedContent(values);
             var response = await client.PostAsync("http://127.0.0.1:5000/stats/", content);
             var responseString = await response.Content.ReadAsStringAsync();
+            MessageBox.Show(responseString);
         }
     }
 }
