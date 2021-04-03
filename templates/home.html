@@ -17,20 +17,19 @@
                 {% endif %}
             </form>
         </div>
-        <div style="padding: 5%;">
+        <div style="padding: 4%;">
+            <section class = "About-section">
+                <h1 style="margin-bottom: 30px;">About</h1>
+                <p>*insert product name here* is designed to you help you organise 'Working from home' life
+                    and help draw the line between your business life and your personal life.
+                    By showing you how you're spending your day on your devices, 
+                    you can get a better understanding on how much personal time you are allocating for yourself.
+                </p>
+            </section>
             <form action="/stats/" method="post">
                 <button name="statsOverview" type="submit" style="width: auto; height: auto;">Lets check your stats</button>
             </form>
         </div>
-
-        <section class = "About-section">
-            <h1>About</h1>
-            <p>*insert product name here* is designed to you help you organise 'Working from home' life
-                and help draw the line between your business life and your personal life.
-                By showing you how you're spending your day on your devices, 
-                you can get a better understanding on how much personal time you are allocating for yourself.
-            </p>
-        </section>
         <script type="text/javascript" src="{{ url_for('static',filename ='particles.js') }}"></script>
         <script type="text/javascript" src="{{ url_for('static',filename ='app.js') }}"></script>
     </body>
