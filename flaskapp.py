@@ -13,10 +13,12 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    stats = db.Column(db.String(100), nullable=False)
 
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
+    db.create_all()
     return render_template("home.html", session=session)
 
 #Login check with client
@@ -58,7 +60,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password))
+            db.session.add(Users(username = username, password = password, stats=f"hours:1~|days:1.1.2000~"))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -84,16 +86,19 @@ def testfn():
 @app.route('/stats/', methods=["POST", "GET"])
 def display():
     global isChanged
-    global hours
-    global days
+    #global hours
+    #global days
 
     if request.method == "POST":
         if "user" not in session:
             return "Not Logged In"
         else:
             if "hours" in request.form and "days" in request.form:
-                hours = request.form["hours"]
-                days = request.form["days"]
+                user_obj = Users.query.filter_by(username=session['user']).first()
+                user_obj.stats = f"hours:{request.form['hours']}|days:{request.form['days']}"
+                db.session.commit()
+                print(user_obj.username)
+                print(user_obj.stats)
                 isChanged = True
                 return "success"
             else:
@@ -101,6 +106,17 @@ def display():
     else:
         if "user" not in session:
             return redirect("/login")
+        stats_dict = {}
+        user_obj = Users.query.filter_by(username=session['user']).first()
+        print(user_obj.username)
+        print(user_obj.stats)
+        key_val_pair = user_obj.stats.split("|")
+        for pair in key_val_pair:
+            key = pair.split(":")[0]
+            val = pair.split(":")[1]
+            stats_dict[key] = val
+        hours = stats_dict["hours"]
+        days = stats_dict["days"]
         temp = ""
         sum = 0
         ylabl = []
