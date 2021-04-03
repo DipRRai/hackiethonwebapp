@@ -13,11 +13,67 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
+    app_time = db.Column(db.String(10000), nullable=False)
+    screen_time = db.Column(db.String(10000), nullable=False)
 
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
+    #db.create_all()
+    #user_obj = Users.query.filter_by(username=session['user']).first()
+    #user_obj.screen_time += "3:5:2021~50|"
+    #db.session.commit()
     return render_template("home.html", session=session)
+
+@app.route("/get_timestats", methods=['POST', 'GET'])
+def get_timestats():
+    if request.method == "POST":
+        if "user" not in session:
+            return "notLoggedIn"
+        else:
+            user_obj = Users.query.filter_by(username=session['user']).first()
+            return user_obj.screen_time
+    else:
+        return "You are not meant to be here"
+
+#Config page for apps that needs to be monitored
+@app.route("/config", methods=["POST", "GET"])
+def config():
+    if "user" not in session:
+        return redirect("/login")
+    else:
+        user_obj = Users.query.filter_by(username=session['user']).first()
+        key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
+        apps = [name.split(":")[0] for name in key_val_pair]
+        app_dict = {}
+        for entry in key_val_pair:
+            key = entry.split(":")[0]
+            val = entry.split(":")[1]
+            app_dict[key] = val
+        if request.method == "POST":
+            if "submit" in request.form and request.form["submit"] == "addapp":
+                app_name = request.form["appname"]
+                if app_name not in apps:
+                    apps.append(app_name)
+                    app_dict[app_name] = "0"
+                    db_str = ""
+                    for app in apps:
+                        db_str += f"{app}:{app_dict[app]}|"
+                    user_obj.app_time = db_str
+                    db.session.commit()
+                return redirect("/config")
+            elif "deleteapp" in request.form and request.form["deleteapp"] != "":
+                apps.remove(request.form["deleteapp"])
+                db_str = ""
+                for app in apps:
+                    db_str += f"{app}:{app_dict[app]}|"
+                user_obj.app_time = db_str
+                db.session.commit()
+                return redirect("/config")
+        else:
+            user_obj = Users.query.filter_by(username=session['user']).first()
+            print(user_obj.app_time)
+            return render_template("config.html", apps=apps)
 
 #Login check with client
 @app.route("/login_client", methods=["GET", "POST"])
@@ -58,7 +114,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password))
+            db.session.add(Users(username = username, password = password, app_time = "example.exe:0|",screen_time="1:1:2000~1|"))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -84,16 +140,17 @@ def testfn():
 @app.route('/stats/', methods=["POST", "GET"])
 def display():
     global isChanged
-    global hours
-    global days
+    #global hours
+    #global days
 
     if request.method == "POST":
         if "user" not in session:
             return "Not Logged In"
         else:
-            if "hours" in request.form and "days" in request.form:
-                hours = request.form["hours"]
-                days = request.form["days"]
+            if "stats" in request.form:
+                user_obj = Users.query.filter_by(username=session['user']).first()
+                user_obj.screen_time = request.form["stats"]
+                db.session.commit()
                 isChanged = True
                 return "success"
             else:
@@ -101,27 +158,18 @@ def display():
     else:
         if "user" not in session:
             return redirect("/login")
-        temp = ""
-        sum = 0
-        ylabl = []
-        for i in hours:
-            if i != ('~'):
-                temp = temp + i
-            elif i == ('~'):
-                ylabl.append(float(temp))
-                temp = ""
-        temp = ""
+        user_obj = Users.query.filter_by(username=session['user']).first()
+        print(user_obj.screen_time)
+        key_val_pair = list(filter(lambda x: len(x) !=0, user_obj.screen_time.split("|")))
         xlabl = []
+        ylabl = []
+        for pair in key_val_pair:
+            hour = pair.split("~")[1]
+            day = pair.split("~")[0]
+            ylabl.append(float(hour))
+            xlabl.append(str(day))
+        sum = 0
         color = []
-        for i in days:
-            if i != ('~'):
-                if i == ':':
-                    temp = temp + "/"
-                else:
-                    temp = temp + i
-            elif i == ('~'):
-                xlabl.append(str(temp))
-                temp = ""
         # small fix for bar graph that creates color values equal to the number of labels (since each label requires a reparate rgba value)
         for i in ylabl:
             color.append("rgba(255, 99, 132, 0.2)")
