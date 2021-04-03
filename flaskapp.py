@@ -179,7 +179,7 @@ def display():
         if "user" not in session:
             return redirect("/login")
         user_obj = Users.query.filter_by(username=session['user']).first()
-        print(user_obj.app_time)
+        #print(user_obj.app_time)
         key_val_pair = list(filter(lambda x: len(x) !=0, user_obj.screen_time.split("|")))
         xlabl = []
         ylabl = []
@@ -198,8 +198,26 @@ def display():
         #######################
         #Examples of what data input could be like
         #######################
-        donutXlabel = ["'youtube", 'twitch', 'microsoft word']
-        donutYlabel = [3,2,5]
+
+        donutXlabel = []
+        donutYlabel = []
+
+        key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
+
+        #print(key_val_pair)
+
+        for pair in key_val_pair:
+            time = pair.split("~")[1]
+            appName = pair.split("~")[0]
+            if appName == "datetime":
+                continue
+            else:
+                donutXlabel.append(appName)
+                donutYlabel.append(float(time))
+
+        #print(donutXlabel)
+        #print(donutYlabel)
+
         return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel)
 
 
