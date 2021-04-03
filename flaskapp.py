@@ -19,8 +19,24 @@ class Users(db.Model):
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
+    #db.create_all()
+    #user_obj = Users.query.filter_by(username=session['user']).first()
+    #user_obj.screen_time += "3:5:2021~50|"
+    #db.session.commit()
     return render_template("home.html", session=session)
 
+@app.route("/get_timestats", methods=['POST', 'GET'])
+def get_timestats():
+    if request.method == "POST":
+        if "user" not in session:
+            return "notLoggedIn"
+        else:
+            user_obj = Users.query.filter_by(username=session['user']).first()
+            return user_obj.screen_time
+    else:
+        return "You are not meant to be here"
+
+#Config page for apps that needs to be monitored
 @app.route("/config", methods=["POST", "GET"])
 def config():
     if "user" not in session:
@@ -98,7 +114,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password, app_time = "example.exe:0|",screen_time="hours:1~|days:1.1.2000~"))
+            db.session.add(Users(username = username, password = password, app_time = "example.exe:0|",screen_time="1:1:2000~1|"))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -131,9 +147,9 @@ def display():
         if "user" not in session:
             return "Not Logged In"
         else:
-            if "hours" in request.form and "days" in request.form:
+            if "stats" in request.form:
                 user_obj = Users.query.filter_by(username=session['user']).first()
-                user_obj.screen_time = f"hours:{request.form['hours']}|days:{request.form['days']}"
+                user_obj.screen_time = request.form["stats"]
                 db.session.commit()
                 isChanged = True
                 return "success"
@@ -142,36 +158,18 @@ def display():
     else:
         if "user" not in session:
             return redirect("/login")
-        stats_dict = {}
         user_obj = Users.query.filter_by(username=session['user']).first()
-        key_val_pair = user_obj.screen_time.split("|")
-        for pair in key_val_pair:
-            key = pair.split(":")[0]
-            val = pair.split(":")[1]
-            stats_dict[key] = val
-        hours = stats_dict["hours"]
-        days = stats_dict["days"]
-        temp = ""
-        sum = 0
-        ylabl = []
-        for i in hours:
-            if i != ('~'):
-                temp = temp + i
-            elif i == ('~'):
-                ylabl.append(float(temp))
-                temp = ""
-        temp = ""
+        print(user_obj.screen_time)
+        key_val_pair = list(filter(lambda x: len(x) !=0, user_obj.screen_time.split("|")))
         xlabl = []
+        ylabl = []
+        for pair in key_val_pair:
+            hour = pair.split("~")[1]
+            day = pair.split("~")[0]
+            ylabl.append(float(hour))
+            xlabl.append(str(day))
+        sum = 0
         color = []
-        for i in days:
-            if i != ('~'):
-                if i == ':':
-                    temp = temp + "/"
-                else:
-                    temp = temp + i
-            elif i == ('~'):
-                xlabl.append(str(temp))
-                temp = ""
         # small fix for bar graph that creates color values equal to the number of labels (since each label requires a reparate rgba value)
         for i in ylabl:
             color.append("rgba(255, 99, 132, 0.2)")
