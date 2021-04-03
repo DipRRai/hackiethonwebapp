@@ -22,7 +22,7 @@
             </canvas>
             <canvas id="donut" width="600" height="100">
             </canvas>
-        {% if hasdataBar == "True" and hasdataDonut == "True" %}
+        {% if hasdataBar == "True" %}
         </div>
             <script>
                 var ctx = document.getElementById('myChart').getContext('2d');
@@ -51,51 +51,56 @@
                         }
                     }
                 });
-            var ctx = document.getElementById('donut').getContext('2d');
-            var donutXlabel = {{ donutXlabel | tojson}};
-            var donutYlabel = {{ donutYlabel }};
-            var myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: donutXlabel,
-                    datasets: [{
-                        label: 'Hours spent online',
-                        data: donutYlabel,
-                        backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                        borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                        borderWidth: 1
-                    }]
-                },
-            });
             </script>
-        <div style="padding: 5px;">
-            <ul style="float: left">
-                <li>
-                    <h3>You have spent {{ sum }} hours on your computer</h3>
-                </li>
-                <li>
-                    <h3>That is an average of {{ average }} hours per day</h3>
-                </li>
-            </ul>
-            <form action="/" method="post">
-                <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
-            </form>
+            <div style="padding: 5px;">
+                <ul style="float: left">
+                    <li>
+                        <h3>You have spent {{ sum }} hours on your computer</h3>
+                    </li>
+                    <li>
+                        <h3>That is an average of {{ average }} hours per day</h3>
+                    </li>
+                </ul>
+                <form action="/" method="post">
+                    <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
+                </form>
+            {% endif %}
+            {% if hasdataDonut == "True"  %}
+            <script>
+                var ctx = document.getElementById('donut').getContext('2d');
+                var donutXlabel = {{ donutXlabel | tojson}};
+                var donutYlabel = {{ donutYlabel }};
+                var myChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: donutXlabel,
+                        datasets: [{
+                            label: 'Hours spent online',
+                            data: donutYlabel,
+                            backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                            borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                            borderWidth: 1
+                        }]
+                    },
+                });
+            </script>
         </div>
-        {% else %}
+        {% endif %}
+        {% if hasdataDonut == "False" and hasdataBar == "False" %}
             <h1>You have no data at the moment, come back after you've run the local app.</h1>
             <form action="/" method="post">
                 <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
