@@ -194,7 +194,12 @@ def display():
         for i in ylabl:
             color.append("rgba(255, 99, 132, 0.2)")
             sum += i
-        average = round(sum / len(ylabl), 2)
+        if len(ylabl) > 0:
+            average = round(sum / len(ylabl), 2)
+            hasdataBar = True
+        else:
+            average = 0
+            hasdataBar = False
         #######################
         #Examples of what data input could be like
         #######################
@@ -214,11 +219,15 @@ def display():
             else:
                 donutXlabel.append(appName)
                 donutYlabel.append(float(time))
+        if len(donutYlabel) > 0:
+            hasdataDonut = True
+        else:
+            hasdataDonut = False
 
         #print(donutXlabel)
         #print(donutYlabel)
 
-        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel)
+        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut)
 
 
 

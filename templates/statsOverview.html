@@ -24,35 +24,34 @@
             </canvas>
         </div>
         
-        
-        <script>
-            var ctx = document.getElementById('myChart').getContext('2d');
-            var ylabel = {{ ylabl }};
-            var xlabel = {{ xlabl | tojson }};
-            var color = {{ color | tojson }};
-            var myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: xlabel,
-                    datasets: [{
-                        label: 'Hours spent online',
-                        data: ylabel,
-                        backgroundColor: color,
-                        borderColor: color,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
+        {% if hasdataBar == True and hasdataDonut == True %}
+            <script>
+                var ctx = document.getElementById('myChart').getContext('2d');
+                var ylabel = {{ ylabl }};
+                var xlabel = {{ xlabl | tojson }};
+                var color = {{ color | tojson }};
+                var myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: xlabel,
+                        datasets: [{
+                            label: 'Hours spent online',
+                            data: ylabel,
+                            backgroundColor: color,
+                            borderColor: color,
+                            borderWidth: 1
                         }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
                     }
-                }
-            });
-
+                });
             var ctx = document.getElementById('donut').getContext('2d');
             var donutXlabel = {{ donutXlabel | tojson}};
             var donutYlabel = {{ donutYlabel }};
