@@ -19,7 +19,7 @@ class Users(db.Model):
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
-    #db.create_all()
+    db.create_all()
     #user_obj = Users.query.filter_by(username=session['user']).first()
     #user_obj.app_time = "Word.exe~0|"
     #db.session.commit()
@@ -126,7 +126,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password, app_time = "example.exe~0|",screen_time="1:1:2000~1|"))
+            db.session.add(Users(username = username, password = password, app_time = "",screen_time=""))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -194,7 +194,11 @@ def display():
         for i in ylabl:
             color.append("rgba(255, 99, 132, 0.2)")
             sum += i
-        average = round(sum / len(ylabl), 2)
+        if len(ylabl) > 0:
+            average = round(sum / len(ylabl), 2)
+        else:
+            average = 0
+
         #######################
         #Examples of what data input could be like
         #######################
