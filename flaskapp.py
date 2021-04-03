@@ -19,6 +19,27 @@ class Users(db.Model):
 def home():
     return render_template("home.html", session=session)
 
+#Login check with client
+@app.route("/login_client", methods=["GET", "POST"])
+def login_check():
+    isLoggedIn = False
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        cred = Users.query.order_by(Users.id).all()
+        for user in cred:
+            if user.username == username and user.password == password:
+                session["user"] = username
+                isLoggedIn = True
+                break
+        if isLoggedIn:
+            return "success"
+        else:
+            return "fail"
+    else:
+        return "You are not supposed to be on here"
+
+#Login page
 @app.route("/login", methods=["POST", "GET"])
 def login():
     isLoggedIn = False
@@ -67,13 +88,16 @@ def display():
     global days
 
     if request.method == "POST":
-        if "hours" in request.form and "days" in request.form:
-            hours = request.form["hours"]
-            days = request.form["days"]
-            isChanged = True
-            return "success"
+        if "user" not in session:
+            return "Not Logged In"
         else:
-            return redirect("/stats")
+            if "hours" in request.form and "days" in request.form:
+                hours = request.form["hours"]
+                days = request.form["days"]
+                isChanged = True
+                return "success"
+            else:
+                return redirect("/stats")
     else:
         if "user" not in session:
             return redirect("/login")
