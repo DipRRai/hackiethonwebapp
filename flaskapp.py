@@ -194,12 +194,13 @@ def display():
         for i in ylabl:
             color.append("rgba(255, 99, 132, 0.2)")
             sum += i
+
         if len(ylabl) > 0:
             average = round(sum / len(ylabl), 2)
-            hasdataBar = True
+            hasdataBar = "True"
         else:
             average = 0
-            hasdataBar = False
+            hasdataBar = "False"
         #######################
         #Examples of what data input could be like
         #######################
@@ -219,10 +220,11 @@ def display():
             else:
                 donutXlabel.append(appName)
                 donutYlabel.append(float(time))
+
         if len(donutYlabel) > 0:
-            hasdataDonut = True
+            hasdataDonut = "True"
         else:
-            hasdataDonut = False
+            hasdataDonut = "False"
 
         #print(donutXlabel)
         #print(donutYlabel)

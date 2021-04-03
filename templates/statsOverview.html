@@ -22,9 +22,8 @@
             </canvas>
             <canvas id="donut" width="600" height="100">
             </canvas>
+        {% if hasdataBar == "True" and hasdataDonut == "True" %}
         </div>
-        
-        {% if hasdataBar == True and hasdataDonut == True %}
             <script>
                 var ctx = document.getElementById('myChart').getContext('2d');
                 var ylabel = {{ ylabl }};
@@ -96,6 +95,12 @@
                 <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
             </form>
         </div>
+        {% else %}
+            <h1>You have no data at the moment, come back after you've run the local app.</h1>
+            <form action="/" method="post">
+                <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>
+            </form>
+        {% endif %}
         <type="text/javascript" src="{{ url_for('static',filename ='particles.js') }}"></type=>
         <type="text/javascript" src="{{ url_for('static',filename ='app.js') }}"></type=>
     </body>
