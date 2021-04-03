@@ -13,13 +13,51 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    stats = db.Column(db.String(100), nullable=False)
+    app_time = db.Column(db.String(10000), nullable=False)
+    screen_time = db.Column(db.String(10000), nullable=False)
 
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
-    db.create_all()
     return render_template("home.html", session=session)
+
+@app.route("/config", methods=["POST", "GET"])
+def config():
+    if "user" not in session:
+        return redirect("/login")
+    else:
+        user_obj = Users.query.filter_by(username=session['user']).first()
+        key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
+        apps = [name.split(":")[0] for name in key_val_pair]
+        app_dict = {}
+        for entry in key_val_pair:
+            key = entry.split(":")[0]
+            val = entry.split(":")[1]
+            app_dict[key] = val
+        if request.method == "POST":
+            if "submit" in request.form and request.form["submit"] == "addapp":
+                app_name = request.form["appname"]
+                if app_name not in apps:
+                    apps.append(app_name)
+                    app_dict[app_name] = "0"
+                    db_str = ""
+                    for app in apps:
+                        db_str += f"{app}:{app_dict[app]}|"
+                    user_obj.app_time = db_str
+                    db.session.commit()
+                return redirect("/config")
+            elif "deleteapp" in request.form and request.form["deleteapp"] != "":
+                apps.remove(request.form["deleteapp"])
+                db_str = ""
+                for app in apps:
+                    db_str += f"{app}:{app_dict[app]}|"
+                user_obj.app_time = db_str
+                db.session.commit()
+                return redirect("/config")
+        else:
+            user_obj = Users.query.filter_by(username=session['user']).first()
+            print(user_obj.app_time)
+            return render_template("config.html", apps=apps)
 
 #Login check with client
 @app.route("/login_client", methods=["GET", "POST"])
@@ -60,7 +98,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password, stats=f"hours:1~|days:1.1.2000~"))
+            db.session.add(Users(username = username, password = password, app_time = "example.exe:0|",screen_time="hours:1~|days:1.1.2000~"))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -95,10 +133,8 @@ def display():
         else:
             if "hours" in request.form and "days" in request.form:
                 user_obj = Users.query.filter_by(username=session['user']).first()
-                user_obj.stats = f"hours:{request.form['hours']}|days:{request.form['days']}"
+                user_obj.screen_time = f"hours:{request.form['hours']}|days:{request.form['days']}"
                 db.session.commit()
-                print(user_obj.username)
-                print(user_obj.stats)
                 isChanged = True
                 return "success"
             else:
@@ -108,9 +144,7 @@ def display():
             return redirect("/login")
         stats_dict = {}
         user_obj = Users.query.filter_by(username=session['user']).first()
-        print(user_obj.username)
-        print(user_obj.stats)
-        key_val_pair = user_obj.stats.split("|")
+        key_val_pair = user_obj.screen_time.split("|")
         for pair in key_val_pair:
             key = pair.split(":")[0]
             val = pair.split(":")[1]
