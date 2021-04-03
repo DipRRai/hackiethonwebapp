@@ -14,7 +14,7 @@
 }, 1000);</script>
     </head>
     <body>
-        <h1>Welcome to your stats page</h1>
+        <h1>Welcome to {{ session["user"] }}'s stats page</h1>
         <canvas id="myChart" width="600" height="100">
             <script>
             var ctx = document.getElementById('myChart').getContext('2d');

@@ -1,17 +1,51 @@
-from flask import Flask, render_template, request, redirect, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///input.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
+app.secret_key = "atomicpotatos"
 
 hours = "1~"
 days = "3:04:2021~"
 isChanged = False
 
+class Users(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
-    return render_template("home.html")
+    return render_template("home.html", session=session)
+
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    isLoggedIn = False
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+        if request.form["button"] == "Login":
+            cred = Users.query.order_by(Users.id).all()
+            for user in cred:
+                if user.username == username and user.password == password:
+                    session["user"] = username
+                    isLoggedIn = True
+                    break
+            if isLoggedIn:
+                return redirect("/")
+            else:
+                return redirect("/login")
+        elif request.form["button"] == "Register":
+            db.session.add(Users(username = username, password = password))
+            db.session.commit()
+            session["user"] = username
+            return redirect("/")
+        else:
+            session.pop("user", None)
+            return redirect("/")
+    else:
+        return render_template("login.html")
 
 @app.route('/test', methods=['GET', 'POST'])
 def testfn():
@@ -29,25 +63,20 @@ def testfn():
 @app.route('/stats/', methods=["POST", "GET"])
 def display():
     global isChanged
-    """
-    global g_hours
-    global isChanged
-    if request.method == "POST":
-        g_hours = request.form["hours"]
-        isChanged = True
-        return redirect("/stats/")
-    else:
-        return render_template("statsOverview.html", hours=g_hours)
-    """
     global hours
     global days
 
     if request.method == "POST":
-        hours = request.form["hours"]
-        days = request.form["days"]
-        isChanged = True
-        return "success"
+        if "hours" in request.form and "days" in request.form:
+            hours = request.form["hours"]
+            days = request.form["days"]
+            isChanged = True
+            return "success"
+        else:
+            return redirect("/stats")
     else:
+        if "user" not in session:
+            return redirect("/login")
         temp = ""
         sum = 0
         ylabl = []
@@ -74,7 +103,7 @@ def display():
             color.append("rgba(255, 99, 132, 0.2)")
             sum += i
         average = round(sum / len(ylabl), 2)
-        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average)
+        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session)
 
 
  ######################################################################################################
