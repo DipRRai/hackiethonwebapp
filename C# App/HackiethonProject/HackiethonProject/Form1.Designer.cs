@@ -28,78 +28,101 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnSubmit = new System.Windows.Forms.Button();
-            this.txtDays = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtHours = new System.Windows.Forms.TextBox();
+            this.components = new System.ComponentModel.Container();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.txtPassword = new System.Windows.Forms.TextBox();
+            this.btnLogin = new System.Windows.Forms.Button();
+            this.lblLoginStatus = new System.Windows.Forms.Label();
+            this.tmrCounter = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
-            // btnSubmit
+            // label3
             // 
-            this.btnSubmit.Location = new System.Drawing.Point(207, 194);
-            this.btnSubmit.Name = "btnSubmit";
-            this.btnSubmit.Size = new System.Drawing.Size(140, 57);
-            this.btnSubmit.TabIndex = 1;
-            this.btnSubmit.Text = "Submit";
-            this.btnSubmit.UseVisualStyleBackColor = true;
-            this.btnSubmit.Click += new System.EventHandler(this.btnSubmit_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(68, 114);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(53, 13);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "Password";
             // 
-            // txtDays
+            // label4
             // 
-            this.txtDays.Location = new System.Drawing.Point(147, 142);
-            this.txtDays.Name = "txtDays";
-            this.txtDays.Size = new System.Drawing.Size(226, 20);
-            this.txtDays.TabIndex = 2;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(66, 77);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(55, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Username";
             // 
-            // label1
+            // txtUsername
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(85, 86);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Hours";
+            this.txtUsername.Location = new System.Drawing.Point(132, 74);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(182, 20);
+            this.txtUsername.TabIndex = 8;
             // 
-            // label2
+            // txtPassword
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(85, 142);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(31, 13);
-            this.label2.TabIndex = 4;
-            this.label2.Text = "Days";
+            this.txtPassword.Location = new System.Drawing.Point(132, 111);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Size = new System.Drawing.Size(182, 20);
+            this.txtPassword.TabIndex = 9;
             // 
-            // txtHours
+            // btnLogin
             // 
-            this.txtHours.Location = new System.Drawing.Point(147, 86);
-            this.txtHours.Name = "txtHours";
-            this.txtHours.Size = new System.Drawing.Size(226, 20);
-            this.txtHours.TabIndex = 5;
+            this.btnLogin.Location = new System.Drawing.Point(132, 155);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(140, 57);
+            this.btnLogin.TabIndex = 10;
+            this.btnLogin.Text = "Login";
+            this.btnLogin.UseVisualStyleBackColor = true;
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            // 
+            // lblLoginStatus
+            // 
+            this.lblLoginStatus.AutoSize = true;
+            this.lblLoginStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblLoginStatus.Location = new System.Drawing.Point(137, 22);
+            this.lblLoginStatus.Name = "lblLoginStatus";
+            this.lblLoginStatus.Size = new System.Drawing.Size(146, 25);
+            this.lblLoginStatus.TabIndex = 11;
+            this.lblLoginStatus.Text = "Not Logged In";
+            // 
+            // tmrCounter
+            // 
+            this.tmrCounter.Enabled = true;
+            this.tmrCounter.Interval = 1000;
+            this.tmrCounter.Tick += new System.EventHandler(this.tmrCounter_Tick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(541, 376);
-            this.Controls.Add(this.txtHours);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.txtDays);
-            this.Controls.Add(this.btnSubmit);
+            this.ClientSize = new System.Drawing.Size(451, 314);
+            this.Controls.Add(this.lblLoginStatus);
+            this.Controls.Add(this.btnLogin);
+            this.Controls.Add(this.txtPassword);
+            this.Controls.Add(this.txtUsername);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label3);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Button btnSubmit;
-        private System.Windows.Forms.TextBox txtDays;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtHours;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox txtUsername;
+        private System.Windows.Forms.TextBox txtPassword;
+        private System.Windows.Forms.Button btnLogin;
+        private System.Windows.Forms.Label lblLoginStatus;
+        private System.Windows.Forms.Timer tmrCounter;
     }
 }
 
