@@ -10,7 +10,7 @@ namespace HackiethonProject
     public partial class Form1 : Form
     {
         /*
-         * 127.0.0.1 URL is for the local hosted server. The deployed server is bowenfeng.pythonanywhere.com 
+         * 127.0.0.1 URL is for the local hosted server. The deployed server is http://bowenfeng.pythonanywhere.com 
          */
         private static readonly HttpClient client = new HttpClient();
         public Form1()
@@ -35,57 +35,66 @@ namespace HackiethonProject
                 { "password", txtPassword.Text}
             };
 
-
-            var content = new FormUrlEncodedContent(values);
-            var response = await client.PostAsync("http://127.0.0.1:5000/login_client", content);
-            var responseString = await response.Content.ReadAsStringAsync();
-            if (responseString == "success")
+            try
             {
-                MessageBox.Show("Successfully logged in");
-                isLoggedIn = true;
-                panel2.BringToFront();
-                panel1.SendToBack();
-                btnMinimize.Visible = true;
+                var content = new FormUrlEncodedContent(values);
+                var response = await client.PostAsync("http://bowenfeng.pythonanywhere.com/login_client", content);
+                var responseString = await response.Content.ReadAsStringAsync();
 
-                lblUsername.AutoSize = false;
-                lblUsername.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-                lblUsername.Dock = DockStyle.Fill;
-                //lblUsername.Left = 10;
-                lblUsername.Text = "Welcome, " + txtUsername.Text;
+                if (responseString == "success")
+                {
+                    MessageBox.Show("Successfully logged in");
+                    isLoggedIn = true;
+                    panel2.BringToFront();
+                    panel1.SendToBack();
+                    btnMinimize.Visible = true;
 
-                //Acquires the user's screen time usage history with a POST request
-                var values_time = new Dictionary<string, string>
+                    lblUsername.AutoSize = false;
+                    lblUsername.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+                    lblUsername.Dock = DockStyle.Fill;
+                    //lblUsername.Left = 10;
+                    lblUsername.Text = "Welcome, " + txtUsername.Text;
+
+                    //Acquires the user's screen time usage history with a POST request
+                    var values_time = new Dictionary<string, string>
                 {
                     {"placeholder",  "placeholder"},
                 };
 
 
-                var content_time = new FormUrlEncodedContent(values_time);
-                var response_time = await client.PostAsync("http://127.0.0.1:5000/get_timestats", content_time);
-                var responseString_time = await response_time.Content.ReadAsStringAsync();
-                string[] entries = responseString_time.Split('|');
-                Dictionary<string, float> temp = new Dictionary<string, float> { };
-                foreach (string entry in entries)
-                {
-                    if (entry.Length == 0)
+                    var content_time = new FormUrlEncodedContent(values_time);
+                    var response_time = await client.PostAsync("http://bowenfeng.pythonanywhere.com/get_timestats", content_time);
+                    var responseString_time = await response_time.Content.ReadAsStringAsync();
+                    string[] entries = responseString_time.Split('|');
+                    Dictionary<string, float> temp = new Dictionary<string, float> { };
+                    foreach (string entry in entries)
                     {
-                        continue;
+                        if (entry.Length == 0)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            string[] pair = entry.Split('~');
+                            string day = pair[0];
+                            float timeCount = float.Parse(pair[1]);
+                            temp[day] = timeCount;
+                        }
                     }
-                    else
-                    {
-                        string[] pair = entry.Split('~');
-                        string day = pair[0];
-                        float timeCount = float.Parse(pair[1]);
-                        temp[day] = timeCount;
-                    }
+                    timeDict = temp;
                 }
-                timeDict = temp;
+                else
+                {
+                    MessageBox.Show("Failed to login ");
+                }
             }
-            else
+            catch(Exception error)
             {
-                MessageBox.Show("Failed to login ");
+                if (error.GetType().IsAssignableFrom(typeof(HttpRequestException)))
+                {
+                    MessageBox.Show("A request could not be made from the client to the server. Check if your internet is up or if the server is runnning. Details: \n\n" + error.ToString());
+                }
             }
-            
         }
 
         private async void Form1_Load(object sender, EventArgs e)
@@ -96,125 +105,135 @@ namespace HackiethonProject
         //Timer that ticks every minute. Each tick, this app will send the updated usage data to the server.
         private async void tmrCounter_Tick(object sender, EventArgs e)
         {
-            globalTimeCount += 1;
-            if (isLoggedIn)
+            try
             {
-                //Recording screen time
-                DateTime localDate = DateTime.Now;
-                string dateString = localDate.Day + ":" + localDate.Month + ":" + localDate.Year;
-                if (timeDict.ContainsKey(dateString))
+                globalTimeCount += 1;
+                if (isLoggedIn)
                 {
-                    timeDict[dateString] += 1;
-                }
-                else
-                {
-                    timeDict[dateString] = 1;
-                }
+                    //Recording screen time
+                    DateTime localDate = DateTime.Now;
+                    string dateString = localDate.Day + ":" + localDate.Month + ":" + localDate.Year;
+                    if (timeDict.ContainsKey(dateString))
+                    {
+                        timeDict[dateString] += 1;
+                    }
+                    else
+                    {
+                        timeDict[dateString] = 1;
+                    }
 
-                string userTimeStat = "";
+                    string userTimeStat = "";
 
-                foreach (KeyValuePair<string, float> kvp in timeDict)
-                {
-                    userTimeStat = userTimeStat + kvp.Key.ToString() + "~" + kvp.Value.ToString() + "|";
-                }
+                    foreach (KeyValuePair<string, float> kvp in timeDict)
+                    {
+                        userTimeStat = userTimeStat + kvp.Key.ToString() + "~" + kvp.Value.ToString() + "|";
+                    }
 
-                var values = new Dictionary<string, string>
+                    var values = new Dictionary<string, string>
                 {
                     {"stats",  userTimeStat}
                 };
 
 
-                var content = new FormUrlEncodedContent(values);
-                var response = await client.PostAsync("http://127.0.0.1:5000/stats/", content);
-                var responseString = await response.Content.ReadAsStringAsync();
+                    var content = new FormUrlEncodedContent(values);
+                    var response = await client.PostAsync("http://bowenfeng.pythonanywhere.com/stats/", content);
+                    var responseString = await response.Content.ReadAsStringAsync();
 
-                //Recording app time.
+                    //Recording app time.
 
-                Dictionary<string, float> appDict = new Dictionary<string, float> { };
+                    Dictionary<string, float> appDict = new Dictionary<string, float> { };
 
-                var content_app = new FormUrlEncodedContent(values);
-                var response_app = await client.PostAsync("http://127.0.0.1:5000/get_appstats", content_app);
-                var responseString_app = await response_app.Content.ReadAsStringAsync();
-                string[] entries = responseString_app.Split('|');
-                string[] firstEntry = entries[0].Split('~');
+                    var content_app = new FormUrlEncodedContent(values);
+                    var response_app = await client.PostAsync("http://bowenfeng.pythonanywhere.com/get_appstats", content_app);
+                    var responseString_app = await response_app.Content.ReadAsStringAsync();
+                    string[] entries = responseString_app.Split('|');
+                    string[] firstEntry = entries[0].Split('~');
 
-                if (firstEntry[0] != "datetime")
-                {
-                    string appString = "datetime~" + dateString+ "|" + responseString_app;
+                    if (firstEntry[0] != "datetime")
+                    {
+                        string appString = "datetime~" + dateString + "|" + responseString_app;
 
-                    var values_app = new Dictionary<string, string>
+                        var values_app = new Dictionary<string, string>
                     {
                         {"appstats", appString}
                     };
 
-                    content_app = new FormUrlEncodedContent(values_app);
-                    response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
-                    responseString_app = await response_app.Content.ReadAsStringAsync();
-                }
-                else
-                {
-                    int count = 0;
-                    bool isNewDay = false;
-                    foreach (string entry in entries)
+                        content_app = new FormUrlEncodedContent(values_app);
+                        response_app = await client.PostAsync("http://bowenfeng.pythonanywhere.com/stats/", content_app);
+                        responseString_app = await response_app.Content.ReadAsStringAsync();
+                    }
+                    else
                     {
-                        if (entry.Length == 0)
+                        int count = 0;
+                        bool isNewDay = false;
+                        foreach (string entry in entries)
                         {
-                            continue;
-                        }
-
-                        if (count == 0)
-                        {
-                            string serverDate = entry.Split('~')[1];
-                            //MessageBox.Show(serverDate + " " + dateString);
-                            if (serverDate != dateString)
+                            if (entry.Length == 0)
                             {
-                                isNewDay = true;
+                                continue;
                             }
-                        }
-                        else
-                        {
-                            if (isNewDay)
+
+                            if (count == 0)
                             {
-                                string[] pair = entry.Split('~');
-                                string appName = pair[0];
-                                float timeCount = 0;
-                                appDict[appName] = 0;
+                                string serverDate = entry.Split('~')[1];
+                                //MessageBox.Show(serverDate + " " + dateString);
+                                if (serverDate != dateString)
+                                {
+                                    isNewDay = true;
+                                }
                             }
                             else
                             {
-                                string[] pair = entry.Split('~');
-                                string appName = pair[0];
-                                float timeCount = float.Parse(pair[1]);
-                                appDict[appName] = timeCount;
-                                foreach (Process p in Process.GetProcesses())
+                                if (isNewDay)
                                 {
-                                    if (p.ProcessName.ToLower() == appName.ToLower())
+                                    string[] pair = entry.Split('~');
+                                    string appName = pair[0];
+                                    float timeCount = 0;
+                                    appDict[appName] = 0;
+                                }
+                                else
+                                {
+                                    string[] pair = entry.Split('~');
+                                    string appName = pair[0];
+                                    float timeCount = float.Parse(pair[1]);
+                                    appDict[appName] = timeCount;
+                                    foreach (Process p in Process.GetProcesses())
                                     {
-                                        appDict[appName] += 1;
-                                        break;
+                                        if (p.ProcessName.ToLower() == appName.ToLower())
+                                        {
+                                            appDict[appName] += 1;
+                                            break;
+                                        }
                                     }
                                 }
                             }
+                            count++;
                         }
-                        count++;
-                    }
 
-                    string userAppStat = "datetime~" + dateString + "|";
-                    foreach (KeyValuePair<string, float> kvp in appDict)
-                    {
-                        userAppStat = userAppStat + kvp.Key.ToString() + "~" + kvp.Value.ToString() + "|";
-                    }
+                        string userAppStat = "datetime~" + dateString + "|";
+                        foreach (KeyValuePair<string, float> kvp in appDict)
+                        {
+                            userAppStat = userAppStat + kvp.Key.ToString() + "~" + kvp.Value.ToString() + "|";
+                        }
 
-                    //MessageBox.Show(userAppStat);
+                        //MessageBox.Show(userAppStat);
 
-                    var values_app = new Dictionary<string, string>
+                        var values_app = new Dictionary<string, string>
                     {
                         {"appstats", userAppStat}
                     };
 
-                    content_app = new FormUrlEncodedContent(values_app);
-                    response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
-                    responseString_app = await response_app.Content.ReadAsStringAsync();
+                        content_app = new FormUrlEncodedContent(values_app);
+                        response_app = await client.PostAsync("http://bowenfeng.pythonanywhere.com/stats/", content_app);
+                        responseString_app = await response_app.Content.ReadAsStringAsync();
+                    }
+                }
+            }
+            catch(Exception error)
+            {
+                if (error.GetType().IsAssignableFrom(typeof(HttpRequestException)))
+                {
+                    MessageBox.Show("A request could not be made from the client to the server. Check if your internet is up or if the server is runnning. Details: \n\n" + error.ToString());
                 }
             }
         }

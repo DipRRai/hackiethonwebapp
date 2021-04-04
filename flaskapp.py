@@ -9,6 +9,7 @@ hours = "1~"
 days = "3:04:2021~"
 isChanged = False
 
+#Database model
 class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
@@ -106,7 +107,7 @@ def home():
         #user_obj = Users.query.filter_by(username=session['user']).first()
         return render_template("home.html", session=session, apps =apps)
 
-#Get current user's screen time statistics
+#URL that is reserved for the smart companion app. Returns screen time usage data
 @app.route("/get_timestats", methods=['POST', 'GET'])
 def get_timestats():
     if request.method == "POST":
@@ -118,6 +119,7 @@ def get_timestats():
     else:
         return "You are not meant to be here"
 
+#URL that is reserved for the smart companion app. Returns app usage data
 @app.route("/get_appstats", methods=["POST","GET"])
 def get_appstats():
     if request.method == "POST":
@@ -187,6 +189,7 @@ def login():
     else:
         return render_template("login.html")
 
+#URL that updates the statistics page. If data has been updated by companion app, URL will instruct stats page to refresh
 @app.route('/test', methods=['GET', 'POST'])
 def testfn():
     global isChanged
@@ -199,7 +202,7 @@ def testfn():
             message = {'changed':'no'}
         return jsonify(message)  # serialize and use JSON headers
 
-#New method with POST requests
+#Returns statistics page, and also receives data sent by companion app.
 @app.route('/stats/', methods=["POST", "GET"])
 def display():
     global isChanged
@@ -208,7 +211,7 @@ def display():
 
     if request.method == "POST":
         if "user" not in session:
-            return "Not Logged In"
+            return redirect("/login")
         else:
             #print(request.form)
             if "stats" in request.form:
@@ -258,9 +261,6 @@ def display():
         else:
             average = 0
             hasdataBar = "False"
-        #######################
-        #Examples of what data input could be like
-        #######################
 
         donutXlabel = []
         donutYlabel = []
