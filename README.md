@@ -1,6 +1,6 @@
 # Trackify (A Hackiethon 2021 project by At0m1c P0tat0s)
 
-###Webpage URL
+### Webpage URL
 
 http://bowenfeng.pythonanywhere.com
 
@@ -16,13 +16,13 @@ it yourself (but make sure to set the URL to the server URL), and it will work e
 
 [Virus total link](https://www.virustotal.com/gui/file/b98be5ffaf09a76f77abdc307e071361dea468fd40b2d44baeaf34b9a89029ba/detection)
 
-###Project description:
+### Project description:
 
 Trackify allows people to visualize and track their computer and app usage through
 a smart companion. Users can also compare their usage to their history, to see if their
 work time has increased
 
-###Usage
+### Usage
 
 Users will first need to create an account on the website. 
 
@@ -39,7 +39,7 @@ After a minute, you should see your screen time and app usage updated.
 Users can also set goals (which are time limits) for screen time and also individual
 app time usage.
 
-###Features
+### Features
 
 - Real time monitoring of screen time and app usage
 
