@@ -271,7 +271,7 @@ def display():
             if appName == "datetime":
                 continue
             else:
-                app_time_dict[appName] = float(time)
+                app_time_dict[appName] = float(time) / 60
                 donutXlabel.append(appName)
                 donutYlabel.append(float(time) / 60)
 
