@@ -29,6 +29,13 @@
             <form action="/stats/" method="post">
                 <button name="statsOverview" type="submit" style="width: auto; height: auto;">Lets check your stats</button>
             </form>
+            {% if "user" in session %}
+                <h1>Goals</h1>
+                <form action="/" method="post">
+                    Your max screen time goal today: <input type = "text" name = 'screentimegoal' id = 'screentimegoal'>
+                    <button name="screentimesubmit" type="submit">Add goal</button>
+                </form>
+            {% endif %}
             <!--Cool logo B)-->
             <div style="display: flex; height: auto; position: fixed; bottom: 2%; right: 2%;">
                 <p style="font-size: 15px;">Another fantastic solution brought to you by Atomic Potatoes™</p>

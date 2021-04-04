@@ -60,6 +60,17 @@
                     <li>
                         <h3>That is an average of {{ average }} hours per day</h3>
                     </li>
+                    <li>
+                        {% if user.screen_time_goal == 0 %}
+                            <h3>You have not set any screen time goals yet</h3>
+                        {% else %}
+                            {% if user.screen_time_goal < sc_time %}
+                                <h3>You have exceeded your screen time goals by {{ sc_time - user.screen_time_goal }}</h3>
+                            {% else %}
+                                <h3>You have {{ user.screen_time_goal - sc_time }} hours until you exceed your screen time goals.</h3>
+                            {% endif %}
+                        {% endif %}
+                    </li>
                 </ul>
                 <form action="/" method="post">
                     <button name="returnHome" type="submit" style="width: 100px; height: 70px; float: right;">Go Home</button>

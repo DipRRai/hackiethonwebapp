@@ -15,15 +15,23 @@ class Users(db.Model):
     password = db.Column(db.String(100), nullable=False)
     app_time = db.Column(db.String(10000), nullable=False)
     screen_time = db.Column(db.String(10000), nullable=False)
+    screen_time_goal = db.Column(db.Integer, nullable=False)
 
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
-    db.create_all()
-    #user_obj = Users.query.filter_by(username=session['user']).first()
-    #user_obj.app_time = "Word.exe~0|"
-    #db.session.commit()
-    return render_template("home.html", session=session)
+    #db.create_all()
+    if request.method == "POST":
+        if "screentimesubmit" in request.form:
+            screen_time_goal = request.form["screentimegoal"]
+            if len(screen_time_goal) == 0:
+                screen_time_goal = 0
+            user_obj = Users.query.filter_by(username=session['user']).first()
+            user_obj.screen_time_goal = int(screen_time_goal)
+            db.session.commit()
+            return redirect("/")
+    else:
+        return render_template("home.html", session=session)
 
 #Get current user's screen time statistics
 @app.route("/get_timestats", methods=['POST', 'GET'])
@@ -126,7 +134,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password, app_time = "",screen_time=""))
+            db.session.add(Users(username = username, password = password, app_time = "",screen_time="", screen_time_goal = 0))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -226,10 +234,12 @@ def display():
         else:
             hasdataDonut = "False"
 
-        #print(donutXlabel)
-        #print(donutYlabel)
+        if len(ylabl) == 0:
+            screen_time_today = 0
+        else:
+            screen_time_today = float(ylabl[-1])
 
-        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut)
+        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut, user=user_obj, sc_time = screen_time_today)
 
 
 
