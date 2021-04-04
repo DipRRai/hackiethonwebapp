@@ -83,7 +83,6 @@
                             {% endif %}
                         {% endif %}
                     </li>
-                    {% if appgoal |length > 0 %}
                         <li class="list-group-item">
                         {% for appname in appgoal %}
                             {% if appname in apptime and appname in appgoal%}
@@ -91,15 +90,14 @@
                                     <h3>You have not set any goals for {{ appname }}</h3>
                                 {% else %}
                                     {% if apptime[appname] > appgoal[appname] %}
-                                        <h3>You have exceeded your {{ appname }} limit by {{ apptime[appname] - appgoal[appname] }} hours</h3>
+                                        <h3>You have exceeded your {{ appname }} limit by {{ apptime[appname] - appgoal[appname]|round(2) }} hours</h3>
                                     {% else %}
-                                        <h3>You have {{ appgoal[appname] - apptime[appname] }} hours until you exceed your {{ appname }} limit </h3>
+                                        <h3>You have {{ appgoal[appname] - apptime[appname]|round(2) }} hours until you exceed your {{ appname }} limit </h3>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
                     </li>
-                    {% endif %}
                 </ul>
             {% endif %}
             {% if hasdataDonut == "True"  %}

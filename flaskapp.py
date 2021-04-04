@@ -299,8 +299,8 @@ def display():
             else:
                 app_goal_dict[appName] = float(time)
 
-        print(app_time_dict)
-        print(app_goal_dict)
+        #print(app_time_dict)
+        #print(app_goal_dict)
 
         return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut, user=user_obj, sc_time = screen_time_today, apptime=app_time_dict, appgoal=app_goal_dict)
 

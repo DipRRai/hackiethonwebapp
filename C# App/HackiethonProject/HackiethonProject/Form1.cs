@@ -9,6 +9,9 @@ namespace HackiethonProject
 {
     public partial class Form1 : Form
     {
+        /*
+         * 127.0.0.1 URL is for the local hosted server. The deployed server is bowenfeng.pythonanywhere.com 
+         */
         private static readonly HttpClient client = new HttpClient();
         public Form1()
         {
@@ -18,11 +21,12 @@ namespace HackiethonProject
             btnMinimize.Visible = false;
         }
 
+
         public Dictionary<string, float> timeDict = new Dictionary<string, float> { };
         public float globalTimeCount = 0;
         public bool isLoggedIn = false;
 
-
+        //Logging into the server
         private async void btnLogin_Click(object sender, EventArgs e)
         {
             var values = new Dictionary<string, string>
@@ -49,6 +53,7 @@ namespace HackiethonProject
                 //lblUsername.Left = 10;
                 lblUsername.Text = "Welcome, " + txtUsername.Text;
 
+                //Acquires the user's screen time usage history with a POST request
                 var values_time = new Dictionary<string, string>
                 {
                     {"placeholder",  "placeholder"},
@@ -88,11 +93,13 @@ namespace HackiethonProject
             //btnUpdate.Enabled = false;
         }
 
+        //Timer that ticks every minute. Each tick, this app will send the updated usage data to the server.
         private async void tmrCounter_Tick(object sender, EventArgs e)
         {
             globalTimeCount += 1;
             if (isLoggedIn)
             {
+                //Recording screen time
                 DateTime localDate = DateTime.Now;
                 string dateString = localDate.Day + ":" + localDate.Month + ":" + localDate.Year;
                 if (timeDict.ContainsKey(dateString))
@@ -121,7 +128,7 @@ namespace HackiethonProject
                 var response = await client.PostAsync("http://127.0.0.1:5000/stats/", content);
                 var responseString = await response.Content.ReadAsStringAsync();
 
-                //App time collection
+                //Recording app time.
 
                 Dictionary<string, float> appDict = new Dictionary<string, float> { };
 
@@ -217,6 +224,8 @@ namespace HackiethonProject
 
         }
 
+
+        //Detects mouse press and performs dragging simulation since Form doesn't have a border.
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
 
