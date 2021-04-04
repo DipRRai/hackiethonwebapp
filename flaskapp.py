@@ -242,7 +242,7 @@ def display():
         for pair in key_val_pair:
             hour = pair.split("~")[1]
             day = pair.split("~")[0]
-            ylabl.append(float(hour) / 60)
+            ylabl.append(round((float(hour) / 60),2))
             xlabl.append(str(day))
 
         sum = 0
@@ -277,7 +277,7 @@ def display():
             else:
                 app_time_dict[appName] = float(time) / 60
                 donutXlabel.append(appName)
-                donutYlabel.append(float(time) / 60)
+                donutYlabel.append(round((float(time) / 60),2))
 
         if len(donutYlabel) > 0:
             hasdataDonut = "True"
