@@ -83,7 +83,8 @@
                             {% endif %}
                         {% endif %}
                     </li>
-                    <li class="list-group-item">
+                    {% if appgoal |length > 0 %}
+                        <li class="list-group-item">
                         {% for appname in appgoal %}
                             {% if appname in apptime and appname in appgoal%}
                                 {% if appgoal[appname] == 0 %}
@@ -98,6 +99,7 @@
                             {% endif %}
                         {% endfor %}
                     </li>
+                    {% endif %}
                 </ul>
             {% endif %}
             {% if hasdataDonut == "True"  %}
