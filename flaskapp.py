@@ -224,7 +224,7 @@ def display():
                 return redirect("/")
             elif "download" in request.form:
                 print("Download")
-                return send_file(filename_or_fp="test.exe", as_attachment=True)
+                return send_file(filename_or_fp="HackiethonProject.exe", as_attachment=True)
             else:
                 return redirect("/stats")
     else:
@@ -271,7 +271,7 @@ def display():
             if appName == "datetime":
                 continue
             else:
-                app_time_dict[appName] = int(time)
+                app_time_dict[appName] = float(time)
                 donutXlabel.append(appName)
                 donutYlabel.append(float(time) / 60)
 
@@ -293,10 +293,10 @@ def display():
             if appName == "datetime":
                 continue
             else:
-                app_goal_dict[appName] = int(time)
+                app_goal_dict[appName] = float(time)
 
-        #print(app_time_dict)
-        #print(app_goal_dict)
+        print(app_time_dict)
+        print(app_goal_dict)
 
         return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut, user=user_obj, sc_time = screen_time_today, apptime=app_time_dict, appgoal=app_goal_dict)
 
