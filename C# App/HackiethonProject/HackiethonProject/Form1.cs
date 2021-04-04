@@ -13,13 +13,16 @@ namespace HackiethonProject
         public Form1()
         {
             InitializeComponent();
+            panel1.BringToFront();
+            panel2.SendToBack();
+            btnMinimize.Visible = false;
         }
 
         public Dictionary<string, float> timeDict = new Dictionary<string, float> { };
         public float globalTimeCount = 0;
         public bool isLoggedIn = false;
 
-        
+
         private async void btnLogin_Click(object sender, EventArgs e)
         {
             var values = new Dictionary<string, string>
@@ -34,10 +37,17 @@ namespace HackiethonProject
             var responseString = await response.Content.ReadAsStringAsync();
             if (responseString == "success")
             {
-                lblLoginStatus.Text = "Welcome, " + txtUsername.Text;
                 MessageBox.Show("Successfully logged in");
                 isLoggedIn = true;
-                //btnUpdate.Enabled = true;
+                panel2.BringToFront();
+                panel1.SendToBack();
+                btnMinimize.Visible = true;
+
+                lblUsername.AutoSize = false;
+                lblUsername.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+                lblUsername.Dock = DockStyle.Fill;
+                //lblUsername.Left = 10;
+                lblUsername.Text = "Welcome, " + txtUsername.Text;
 
                 var values_time = new Dictionary<string, string>
                 {
@@ -87,11 +97,11 @@ namespace HackiethonProject
                 string dateString = localDate.Day + ":" + localDate.Month + ":" + localDate.Year;
                 if (timeDict.ContainsKey(dateString))
                 {
-                    timeDict[dateString] += globalTimeCount;
+                    timeDict[dateString] += 1;
                 }
                 else
                 {
-                    timeDict[dateString] = globalTimeCount;
+                    timeDict[dateString] = 1;
                 }
 
                 string userTimeStat = "";
@@ -138,7 +148,6 @@ namespace HackiethonProject
                 {
                     int count = 0;
                     bool isNewDay = false;
-                    richTextBox1.Text += string.Join(",", entries) + '\n';
                     foreach (string entry in entries)
                     {
                         if (entry.Length == 0)
@@ -200,6 +209,67 @@ namespace HackiethonProject
                     response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
                     responseString_app = await response_app.Content.ReadAsStringAsync();
                 }
+            }
+        }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HT_CAPTION = 0x2;
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        private void Form1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        private void panel2_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        private void panel1_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.WindowState = FormWindowState.Normal;
+            notifyIcon1.Visible = false;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+            notifyIcon1.Visible = true;
+        }
+
+        private void lblUsername_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
         }
     }

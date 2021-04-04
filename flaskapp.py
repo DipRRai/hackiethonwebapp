@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify, session
+from flask import Flask, render_template, request, redirect, jsonify, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -46,6 +46,7 @@ def home():
     #print(user_obj.app_time_goals)
 
     if request.method == "POST":
+        print(request.form)
         if "screentimesubmit" in request.form:
             screen_time_goal = request.form["screentimegoal"]
             if len(screen_time_goal) == 0:
@@ -93,6 +94,12 @@ def home():
             user_obj.app_time = db_str
             db.session.commit()
             return redirect("/")
+
+        elif "button" in request.form and request.form["button"] == "Stats":
+            return redirect("/stats")
+
+        elif "button" in request.form and request.form["button"] == "Login":
+            return redirect("/login")
 
         return redirect("/")
     else:
@@ -213,6 +220,11 @@ def display():
                 db.session.commit()
                 isChanged = True
                 return "success"
+            elif "returnHome" in request.form:
+                return redirect("/")
+            elif "download" in request.form:
+                print("Download")
+                return send_file(filename_or_fp="test.exe", as_attachment=True)
             else:
                 return redirect("/stats")
     else:
@@ -226,8 +238,9 @@ def display():
         for pair in key_val_pair:
             hour = pair.split("~")[1]
             day = pair.split("~")[0]
-            ylabl.append(float(hour))
+            ylabl.append(float(hour) / 60)
             xlabl.append(str(day))
+
         sum = 0
         color = []
         # small fix for bar graph that creates color values equal to the number of labels (since each label requires a reparate rgba value)
@@ -260,7 +273,7 @@ def display():
             else:
                 app_time_dict[appName] = int(time)
                 donutXlabel.append(appName)
-                donutYlabel.append(float(time))
+                donutYlabel.append(float(time) / 60)
 
         if len(donutYlabel) > 0:
             hasdataDonut = "True"
@@ -286,63 +299,6 @@ def display():
         #print(app_goal_dict)
 
         return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut, user=user_obj, sc_time = screen_time_today, apptime=app_time_dict, appgoal=app_goal_dict)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- ######################################################################################################
-      #Old method for URL query
-#####################################################################################################     
-#Current stats page with autogenerating graph
-#url.com/<hours>/<days>
-#hours in order matching days separated by ~ for each new entry (hours can support float values)
-#days in order matching hours separated by ~ for each new entry, additionally use : instead of / w
-#the graph scales with number of entries so as long as you can make a link it can generate a graph
-#the graph type can be customised by just changing one word (bar, line ...)
-#Example link
-#http://127.0.0.1:5000/stats/6.9~5.2~3.7~5.8~8~/3:04:2021~4:04:2021~5:04:2021~6:04:2021~7:04:2021~~
-@app.route('/stats/<hours>/<days>', methods=['POST','GET'])
-def stats(hours, days):
-#Converts input link into sets of arrays that is fed into graph.js
-    temp = ""
-    sum = 0
-    ylabl = []
-    for i in hours:
-        if i != ('~'):
-            temp = temp + i
-        elif i == ('~'):
-            ylabl.append(float(temp))
-            temp = ""
-    temp = ""
-    xlabl = []
-    color = []
-    for i in days:
-        if i != ('~'):
-            if i == ':':
-                temp = temp + "/"
-            else:
-                temp = temp + i
-        elif i == ('~'):
-            xlabl.append(str(temp))
-            temp = ""
-    #small fix for bar graph that creates color values equal to the number of labels (since each label requires a reparate rgba value)
-    for i in ylabl:
-        color.append("rgba(255, 99, 132, 0.2)")
-        sum += i
-    average = round(sum / len(ylabl), 2)
-    return render_template("statsOverview.html", xlabl = xlabl, ylabl = ylabl, color = color, sum = sum, average = average)
-
 
 if __name__ == "__main__":
     app.run(debug=True)
