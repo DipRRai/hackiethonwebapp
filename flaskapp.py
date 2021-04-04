@@ -93,6 +93,8 @@ def home():
             user_obj.app_time = db_str
             db.session.commit()
             return redirect("/")
+
+        return redirect("/")
     else:
         #user_obj = Users.query.filter_by(username=session['user']).first()
         return render_template("home.html", session=session, apps =apps)
