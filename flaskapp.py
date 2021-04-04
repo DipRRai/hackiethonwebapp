@@ -173,6 +173,10 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
+            cred = Users.query.order_by(Users.id).all()
+            for user in cred:
+                if username == user.username:
+                    return redirect("/login")
             db.session.add(Users(username = username, password = password, app_time = "",screen_time="", screen_time_goal = 0, app_time_goals = ""))
             db.session.commit()
             session["user"] = username
