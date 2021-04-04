@@ -16,11 +16,35 @@ class Users(db.Model):
     app_time = db.Column(db.String(10000), nullable=False)
     screen_time = db.Column(db.String(10000), nullable=False)
     screen_time_goal = db.Column(db.Integer, nullable=False)
+    app_time_goals = db.Column(db.String(10000), nullable=False)
 
 #Returns default home page
 @app.route("/", methods=['POST', 'GET'])
 def home():
     #db.create_all()
+    #return "bruh"
+    if "user" in session:
+        user_obj = Users.query.filter_by(username=session['user']).first()
+        key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
+        apps = [name.split("~")[0] for name in key_val_pair]
+        app_dict = {}
+        for entry in key_val_pair:
+            key = entry.split("~")[0]
+            val = entry.split("~")[1]
+            app_dict[key] = val
+
+        app_goal_dict = {}
+        app_time_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time_goals.split("|")))
+        for entry in app_time_pair:
+            app_name = entry.split("~")[0]
+            goal_time = entry.split("~")[1]
+            app_goal_dict[app_name] = goal_time
+    else:
+        apps = []
+
+
+    #print(user_obj.app_time_goals)
+
     if request.method == "POST":
         if "screentimesubmit" in request.form:
             screen_time_goal = request.form["screentimegoal"]
@@ -30,8 +54,48 @@ def home():
             user_obj.screen_time_goal = int(screen_time_goal)
             db.session.commit()
             return redirect("/")
+
+        elif "submit" in request.form and request.form["submit"] == "addapp":
+            app_name = request.form["appname"]
+            if app_name not in apps:
+                apps.append(app_name)
+                app_dict[app_name] = "0"
+                app_goal_dict[app_name] = "0"
+                db_str = ""
+                apptime_str = ""
+                for app in apps:
+                    db_str += f"{app}~{app_dict[app]}|"
+                    if app != "datetime":
+                        apptime_str += f"{app}~{app_goal_dict[app]}|"
+                user_obj.app_time = db_str
+                user_obj.app_time_goals = apptime_str
+                db.session.commit()
+            return redirect("/")
+
+        elif "apptimesubmit" in request.form and request.form["apptimesubmit"] != "":
+            app_goal = request.form[request.form["apptimesubmit"]]
+            app_goal_dict[request.form["apptimesubmit"]] = app_goal
+            #print(app_goal_dict)
+            db_str = ""
+            for app_name in apps:
+                if app_name != "datetime":
+                    db_str += f"{app_name}~{app_goal_dict[app_name]}|"
+            user_obj.app_time_goals = db_str
+            db.session.commit()
+            return redirect("/")
+
+        elif "deleteapp" in request.form and request.form["deleteapp"] != "":
+            apps.remove(request.form["deleteapp"])
+            db_str = ""
+            for app in apps:
+                db_str += f"{app}~{app_dict[app]}|"
+
+            user_obj.app_time = db_str
+            db.session.commit()
+            return redirect("/")
     else:
-        return render_template("home.html", session=session)
+        #user_obj = Users.query.filter_by(username=session['user']).first()
+        return render_template("home.html", session=session, apps =apps)
 
 #Get current user's screen time statistics
 @app.route("/get_timestats", methods=['POST', 'GET'])
@@ -59,41 +123,7 @@ def get_appstats():
 #Config page for apps that needs to be monitored
 @app.route("/config", methods=["POST", "GET"])
 def config():
-    if "user" not in session:
-        return redirect("/login")
-    else:
-        user_obj = Users.query.filter_by(username=session['user']).first()
-        key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
-        apps = [name.split("~")[0] for name in key_val_pair]
-        app_dict = {}
-        for entry in key_val_pair:
-            key = entry.split("~")[0]
-            val = entry.split("~")[1]
-            app_dict[key] = val
-        if request.method == "POST":
-            if "submit" in request.form and request.form["submit"] == "addapp":
-                app_name = request.form["appname"]
-                if app_name not in apps:
-                    apps.append(app_name)
-                    app_dict[app_name] = "0"
-                    db_str = ""
-                    for app in apps:
-                        db_str += f"{app}~{app_dict[app]}|"
-                    user_obj.app_time = db_str
-                    db.session.commit()
-                return redirect("/config")
-            elif "deleteapp" in request.form and request.form["deleteapp"] != "":
-                apps.remove(request.form["deleteapp"])
-                db_str = ""
-                for app in apps:
-                    db_str += f"{app}~{app_dict[app]}|"
-                user_obj.app_time = db_str
-                db.session.commit()
-                return redirect("/config")
-        else:
-            user_obj = Users.query.filter_by(username=session['user']).first()
-            print(user_obj.app_time)
-            return render_template("config.html", apps=apps)
+    return "Deprecated. Check main page"
 
 #Login check with client
 @app.route("/login_client", methods=["GET", "POST"])
@@ -134,7 +164,7 @@ def login():
             else:
                 return redirect("/login")
         elif request.form["button"] == "Register":
-            db.session.add(Users(username = username, password = password, app_time = "",screen_time="", screen_time_goal = 0))
+            db.session.add(Users(username = username, password = password, app_time = "",screen_time="", screen_time_goal = 0, app_time_goals = ""))
             db.session.commit()
             session["user"] = username
             return redirect("/")
@@ -219,13 +249,14 @@ def display():
         key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time.split("|")))
 
         #print(key_val_pair)
-
+        app_time_dict = {}
         for pair in key_val_pair:
             time = pair.split("~")[1]
             appName = pair.split("~")[0]
             if appName == "datetime":
                 continue
             else:
+                app_time_dict[appName] = int(time)
                 donutXlabel.append(appName)
                 donutYlabel.append(float(time))
 
@@ -239,7 +270,20 @@ def display():
         else:
             screen_time_today = float(ylabl[-1])
 
-        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut, user=user_obj, sc_time = screen_time_today)
+        app_goal_dict = {}
+        key_val_pair = list(filter(lambda x: len(x) != 0, user_obj.app_time_goals.split("|")))
+        for pair in key_val_pair:
+            time = pair.split("~")[1]
+            appName = pair.split("~")[0]
+            if appName == "datetime":
+                continue
+            else:
+                app_goal_dict[appName] = int(time)
+
+        #print(app_time_dict)
+        #print(app_goal_dict)
+
+        return render_template("statsOverview.html", xlabl=xlabl, ylabl=ylabl, color=color, sum=sum, average=average, session = session, donutXlabel = donutXlabel, donutYlabel = donutYlabel, hasdataBar = hasdataBar, hasdataDonut = hasdataDonut, user=user_obj, sc_time = screen_time_today, apptime=app_time_dict, appgoal=app_goal_dict)
 
 
 

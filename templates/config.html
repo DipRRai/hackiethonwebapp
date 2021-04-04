@@ -5,13 +5,5 @@
     <title>Config page</title>
 </head>
 <body>
-<form method = "post" action = "/config">
-    App Name: <input type = "text" name = 'appname' id = 'appname'>
-    <button type = "submit" name="submit" value="addapp">Add App</button>
-    {% for app in apps %}
-        <h3>App Name: {{ app }}</h3>
-        <button type = "submit" name="deleteapp" value={{ app }}>Delete App</button>
-    {% endfor %}
-</form>
 </body>
 </html>

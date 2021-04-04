@@ -35,6 +35,19 @@
                     Your max screen time goal today: <input type = "text" name = 'screentimegoal' id = 'screentimegoal'>
                     <button name="screentimesubmit" type="submit">Add goal</button>
                 </form>
+                <form method = "post" action = "/">
+                    App Name: <input type = "text" name = 'appname' id = 'appname'>
+                    <button type = "submit" name="submit" value="addapp">Add App</button>
+                    {% for app in apps %}
+                        {% if app != "datetime" %}
+                            <h3>App Name: {{ app }}</h3>
+                            <button type = "submit" name="deleteapp" value={{ app }}>Delete App</button>
+                            Your goal for this app: <input type = "text" name = '{{ app }}'>
+                            <button type = "submit" name="apptimesubmit" value={{ app }}>Add goal</button>
+                        {% endif %}
+                    {% endfor %}
+                </form>
+
             {% endif %}
             <!--Cool logo B)-->
             <div style="display: flex; height: auto; position: fixed; bottom: 2%; right: 2%;">

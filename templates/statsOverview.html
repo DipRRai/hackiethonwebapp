@@ -65,11 +65,26 @@
                             <h3>You have not set any screen time goals yet</h3>
                         {% else %}
                             {% if user.screen_time_goal < sc_time %}
-                                <h3>You have exceeded your screen time goals by {{ sc_time - user.screen_time_goal }}</h3>
+                                <h5>You have exceeded your screen time goals by {{ sc_time - user.screen_time_goal }}</h5>
                             {% else %}
-                                <h3>You have {{ user.screen_time_goal - sc_time }} hours until you exceed your screen time goals.</h3>
+                                <h5>You have {{ user.screen_time_goal - sc_time }} hours until you exceed your screen time goals.</h5>
                             {% endif %}
                         {% endif %}
+                    </li>
+                    <li>
+                        {% for appname in appgoal %}
+                            {% if appname in apptime and appname in appgoal%}
+                                {% if appgoal[appname] == 0 %}
+                                    <h5>You have not set any goals for {{ appname }}</h5>
+                                {% else %}
+                                    {% if apptime[appname] > appgoal[appname] %}
+                                        <h5>You have exceeded your {{ appname }} limit by {{ apptime[appname] - appgoal[appname] }}</h5>
+                                    {% else %}
+                                        <h5>You have {{ appgoal[appname] - apptime[appname] }} until you exceed your {{ appname }} limit </h5>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
                     </li>
                 </ul>
                 <form action="/" method="post">
