@@ -23,7 +23,7 @@
             </form>
         </div>
         {% if hasdataDonut == "False" and hasdataBar == "False" %}
-            <h1 style="margin: 5%;">You have no data at the moment, come back after you've run the local app.</h1>
+            <h1 style="margin: 5%;">You have no data at the moment, come back after you've run the smart companion. You can download the companion app by clicking on the download button on the top right hand corner.</h1>
         {% endif %}
         <div style="display: flex; width: 100%; text-align: center; padding: 2%; margin-left: 10%;">
             <section style="">
@@ -64,8 +64,8 @@
                     }
                 });
             </script>
-            <div style="padding: 5px; margin-left: 10%; text-align: center;">
-                <ul class="list-group" style="display: inline-block; margin-left: 35px; margin-bottom: 35px;">
+            <div style="padding: 5px; margin-left: 0%; text-align: center;">
+                <ul class="list-group" style="display: inline-block; margin-right: 0px; margin-bottom: 35px">
                     <li class="list-group-item">
                         <h3>You have spent {{ sum }} hours on your computer</h3>
                     </li>
@@ -77,9 +77,9 @@
                             <h3>You have not set any screen time goals yet</h3>
                         {% else %}
                             {% if user.screen_time_goal < sc_time %}
-                                <h3>You have exceeded your screen time goals by {{ sc_time - user.screen_time_goal }} hours</h3>
+                                <h3>You have exceeded your screen time goals by {{ (sc_time - user.screen_time_goal)|round(2) }} hours</h3>
                             {% else %}
-                                <h3>You have {{ user.screen_time_goal - sc_time }} hours until you exceed your screen time goals.</h3>
+                                <h3>You have {{ (user.screen_time_goal - sc_time)|round(2) }} hours until you exceed your screen time goals.</h3>
                             {% endif %}
                         {% endif %}
                     </li>
@@ -90,15 +90,19 @@
                                     <h3>You have not set any goals for {{ appname }}</h3>
                                 {% else %}
                                     {% if apptime[appname] > appgoal[appname] %}
-                                        <h3>You have exceeded your {{ appname }} limit by {{ apptime[appname] - appgoal[appname]|round(2) }} hours</h3>
+                                        <h3>You have exceeded your {{ appname }} limit by {{ (apptime[appname] - appgoal[appname])|round(2) }} hours</h3>
                                     {% else %}
-                                        <h3>You have {{ appgoal[appname] - apptime[appname]|round(2) }} hours until you exceed your {{ appname }} limit </h3>
+                                        <h3>You have {{ (appgoal[appname] - apptime[appname])|round(2) }} hours until you exceed your {{ appname }} limit </h3>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
                         {% endfor %}
                     </li>
                 </ul>
+            {% endif %}
+            {% if hasdataDonut == "True" or hasdataBar == "True" %}
+            <h3 style="text-align: center; margin-right: 100px; margin-left: 100px">If you do not see graphs/see empty space/empty graph. Please download the app by clicking the download button on the top right hand corner.</h3>
+            <h3 style="text-align: center; margin-right: 100px; margin-left: 100px">If you already have downloaded and ran the companion, do not panick. The app updates this page every minute. Check back in 1 minute to see your statistics.</h3>
             {% endif %}
             {% if hasdataDonut == "True"  %}
             <script>

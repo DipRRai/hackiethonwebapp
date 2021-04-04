@@ -38,7 +38,7 @@ namespace HackiethonProject
             try
             {
                 var content = new FormUrlEncodedContent(values);
-                var response = await client.PostAsync("http://bowenfeng.pythonanywhere.com/login_client", content);
+                var response = await client.PostAsync("http://127.0.0.1:5000/login_client", content);
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 if (responseString == "success")
@@ -63,7 +63,7 @@ namespace HackiethonProject
 
 
                     var content_time = new FormUrlEncodedContent(values_time);
-                    var response_time = await client.PostAsync("http://bowenfeng.pythonanywhere.com/get_timestats", content_time);
+                    var response_time = await client.PostAsync("http://127.0.0.1:5000/get_timestats", content_time);
                     var responseString_time = await response_time.Content.ReadAsStringAsync();
                     string[] entries = responseString_time.Split('|');
                     Dictionary<string, float> temp = new Dictionary<string, float> { };
@@ -136,7 +136,7 @@ namespace HackiethonProject
 
 
                     var content = new FormUrlEncodedContent(values);
-                    var response = await client.PostAsync("http://bowenfeng.pythonanywhere.com/stats/", content);
+                    var response = await client.PostAsync("http://127.0.0.1:5000/stats/", content);
                     var responseString = await response.Content.ReadAsStringAsync();
 
                     //Recording app time.
@@ -144,7 +144,7 @@ namespace HackiethonProject
                     Dictionary<string, float> appDict = new Dictionary<string, float> { };
 
                     var content_app = new FormUrlEncodedContent(values);
-                    var response_app = await client.PostAsync("http://bowenfeng.pythonanywhere.com/get_appstats", content_app);
+                    var response_app = await client.PostAsync("http://127.0.0.1:5000/get_appstats", content_app);
                     var responseString_app = await response_app.Content.ReadAsStringAsync();
                     string[] entries = responseString_app.Split('|');
                     string[] firstEntry = entries[0].Split('~');
@@ -159,7 +159,7 @@ namespace HackiethonProject
                     };
 
                         content_app = new FormUrlEncodedContent(values_app);
-                        response_app = await client.PostAsync("http://bowenfeng.pythonanywhere.com/stats/", content_app);
+                        response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
                         responseString_app = await response_app.Content.ReadAsStringAsync();
                     }
                     else
@@ -224,7 +224,7 @@ namespace HackiethonProject
                     };
 
                         content_app = new FormUrlEncodedContent(values_app);
-                        response_app = await client.PostAsync("http://bowenfeng.pythonanywhere.com/stats/", content_app);
+                        response_app = await client.PostAsync("http://127.0.0.1:5000/stats/", content_app);
                         responseString_app = await response_app.Content.ReadAsStringAsync();
                     }
                 }
